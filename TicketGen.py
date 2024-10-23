@@ -178,19 +178,25 @@ class TicketGenerator:
 
     def add_qr_code(self, ticket: Image.Image, qr_data: str):
         qr = qrcode.QRCode(
-            version=2,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=8,
-            border=2,
-        )
+        version=2,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,  
+        box_size=8,
+        border=2,
+    )
         qr.add_data(qr_data)
         qr.make(fit=True)
-        qr_code = qr.make_image(fill_color="black", back_color="white")
+        qr_code = qr.make_image(fill_color="black", back_color="white").convert('RGB')
         qr_code = qr_code.resize((320, 320))
+        logo = Image.open('./EVNTia.png')
+        logo_size = (80, 40)  
+        logo = logo.resize(logo_size)
+        logo_position = (
+            (qr_code.size[0] - logo_size[0]) // 2,  
+            (qr_code.size[1] - logo_size[1]) // 2   
+        )
+        qr_code.paste(logo, logo_position, mask=logo)  
+        ticket.paste(qr_code, (830, 50))
 
-        qr_background = Image.new('RGB', (320, 320), 'white')
-        qr_background.paste(qr_code, (0, 0))
-        ticket.paste(qr_background, (830, 50))
 
 if __name__ == "__main__":
     event = EventDetails(
